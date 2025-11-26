@@ -15,16 +15,21 @@ const Starfield: React.FC = () => {
     const setSize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      ctx.scale(dpr, dpr);
     };
     setSize();
     window.addEventListener('resize', setSize);
 
     const stars: {x: number, y: number, z: number, o: number}[] = [];
-    const numStars = 150; // Reduced count
-    // Much slower speed for elegance
-    const speed = 0.15; 
+    const numStars = 100; // Minimalist count
+    const speed = 0.05; // Extremely slow
 
     for(let i=0; i<numStars; i++) {
       stars.push({
@@ -36,7 +41,6 @@ const Starfield: React.FC = () => {
     }
 
     const animate = () => {
-      // Clear with very slight transparency for trails? No, crisp for Apple look.
       ctx.clearRect(0, 0, width, height);
 
       stars.forEach(star => {
@@ -48,10 +52,10 @@ const Starfield: React.FC = () => {
         }
 
         // Twinkle slowly
-        const opacity = 0.2 + 0.3 * Math.sin(Date.now() * 0.001 * star.o);
+        const opacity = 0.1 + 0.3 * Math.sin(Date.now() * 0.001 * star.o);
         
         ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-        const size = Math.max(0.2, star.z * 1.0); // Smaller stars
+        const size = Math.max(0.2, star.z * 1.2); 
         
         ctx.beginPath();
         ctx.arc(star.x, star.y, size, 0, Math.PI * 2);

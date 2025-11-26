@@ -1,16 +1,37 @@
 import { GoogleGenAI } from "@google/genai";
 import { RESUME_DATA } from '../constants';
 
-const apiKey = process.env.API_KEY || '';
-// Initialize safe AI client
+// Safely retrieve API Key from Vite environment or Node process environment
+const getApiKey = (): string => {
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY || '';
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.API_KEY || '';
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return '';
+};
+
+const apiKey = getApiKey();
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const generateAIResponse = async (userQuery: string): Promise<string> => {
   if (!ai) {
-    return "API Key is missing. Please configure the environment.";
+    return "Configuration Error: API Key is missing. Please add VITE_API_KEY to your environment variables.";
   }
 
-  // Construct a prompt that includes the resume context
   const context = JSON.stringify(RESUME_DATA);
   
   const systemInstruction = `

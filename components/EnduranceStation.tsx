@@ -14,15 +14,30 @@ const EnduranceStation: React.FC = () => {
     let height = 0;
 
     const handleResize = () => {
-      width = canvas.width = canvas.parentElement?.clientWidth || window.innerWidth;
-      height = canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
+      // Handle High DPI displays (Retina)
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement?.getBoundingClientRect();
+      
+      if (rect) {
+        width = rect.width;
+        height = rect.height;
+        
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        
+        // CSS size must remain the same
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        
+        ctx.scale(dpr, dpr);
+      }
     };
+    
     handleResize();
     window.addEventListener('resize', handleResize);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      // Smooth lerp target eventually, but direct for now
       mouseRef.current = {
         x: ((e.clientX - rect.left) / width) * 2 - 1,
         y: ((e.clientY - rect.top) / height) * 2 - 1,
@@ -32,10 +47,11 @@ const EnduranceStation: React.FC = () => {
 
     // Station Parameters
     const numModules = 12;
-    const radius = Math.min(width, height) * 0.28;
-    const moduleWidth = radius * 0.45;
-    const moduleHeight = radius * 0.12;
-    const moduleDepth = radius * 0.18;
+    // slightly larger radius for impact
+    const baseRadius = Math.min(width, height) * 0.3; 
+    const moduleWidth = baseRadius * 0.45;
+    const moduleHeight = baseRadius * 0.12;
+    const moduleDepth = baseRadius * 0.18;
     let rotation = 0;
 
     interface Point3D { x: number; y: number; z: number; }
@@ -44,11 +60,11 @@ const EnduranceStation: React.FC = () => {
       // Subtle organic movement
       const time = Date.now() * 0.0005;
       
-      const targetTiltX = mouseRef.current.y * 0.1 + Math.sin(time) * 0.05; 
-      const targetTiltY = mouseRef.current.x * 0.1 + Math.cos(time * 0.8) * 0.05;
+      const targetTiltX = mouseRef.current.y * 0.05 + Math.sin(time) * 0.03; 
+      const targetTiltY = mouseRef.current.x * 0.05 + Math.cos(time * 0.8) * 0.03;
       
       // Initial Tilt for composition (The "Endurance" angle)
-      const baseTilt = 0.6; 
+      const baseTilt = 0.5; 
 
       // Rotate around X
       let y = p.y * Math.cos(targetTiltX + baseTilt) - p.z * Math.sin(targetTiltX + baseTilt);
@@ -86,11 +102,16 @@ const EnduranceStation: React.FC = () => {
     };
 
     const animate = () => {
+      // Clear scaled rect
       ctx.clearRect(0, 0, width, height);
+      
       const centerX = width / 2;
       const centerY = height / 2;
+      
+      // Recalculate radius on frame to handle resizing smoothly
+      const radius = Math.min(width, height) * 0.3;
 
-      rotation += 0.0015; // Very slow, majestic rotation
+      rotation += 0.001; // Very slow, majestic rotation
 
       const allFaces: {pts: {x:number, y:number, z:number}[], avgZ: number, fill: string, stroke: string}[] = [];
 
@@ -112,15 +133,14 @@ const EnduranceStation: React.FC = () => {
           
           // Shading logic: clearer, cleaner, monochromatic
           // Map depth to a narrow range of greys for a "matte" look
-          const depth = Math.max(0, Math.min(1, (avgZ + 400) / 800));
+          const depth = Math.max(0, Math.min(1, (avgZ + 500) / 1000));
           
-          // Base color (Dark Slate to Light Grey)
-          // 40,40,45 -> 100,100,110
-          const base = 20 + (1-depth) * 60; 
-          const fill = `rgba(${base}, ${base}, ${base + 5}, 0.9)`;
+          // Base color (Dark Zinc)
+          const base = 30 + (1-depth) * 50; 
+          const fill = `rgba(${base}, ${base}, ${base + 5}, 0.95)`;
           
           // Edges - very subtle
-          const stroke = `rgba(150, 150, 160, 0.15)`;
+          const stroke = `rgba(200, 200, 210, 0.1)`;
           
           allFaces.push({ pts, avgZ, fill, stroke });
         });
@@ -140,7 +160,7 @@ const EnduranceStation: React.FC = () => {
            pts: [p1, p2],
            avgZ: (p1.z + p2.z)/2,
            fill: 'transparent',
-           stroke: 'rgba(255, 255, 255, 0.2)' 
+           stroke: 'rgba(255, 255, 255, 0.15)' 
          });
       }
 
