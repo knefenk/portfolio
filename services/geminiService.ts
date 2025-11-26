@@ -1,26 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 import { RESUME_DATA } from '../constants';
 
-// Safely retrieve API Key from Vite environment or Node process environment
+// Safely retrieve API Key from Vite environment (Production)
 const getApiKey = (): string => {
   try {
+    // Vite exposes env vars on import.meta.env
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env) {
       // @ts-ignore
-      return import.meta.env.VITE_API_KEY || '';
+      const key = import.meta.env.VITE_API_KEY;
+      if (key) return key;
     }
   } catch (e) {
-    // ignore
+    // Fallback or ignore
   }
-
-  try {
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env.API_KEY || '';
-    }
-  } catch (e) {
-    // ignore
-  }
-
   return '';
 };
 
@@ -29,7 +22,7 @@ const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const generateAIResponse = async (userQuery: string): Promise<string> => {
   if (!ai) {
-    return "Configuration Error: API Key is missing. Please add VITE_API_KEY to your environment variables.";
+    return "Configuration Error: API Key is missing. Please set the VITE_API_KEY environment variable in your Vercel project settings.";
   }
 
   const context = JSON.stringify(RESUME_DATA);
