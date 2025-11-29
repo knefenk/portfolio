@@ -75,7 +75,7 @@ const App: React.FC = () => {
                 <ArrowUpRight size={16} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
               </a>
               <div className="flex gap-6">
-                <a href={`https://${RESUME_DATA.personal.linkedin}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white transition-colors"><Linkedin size={20} className="md:w-6 md:h-6" /></a>
+                <a href={`${RESUME_DATA.personal.linkedin}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white transition-colors"><Linkedin size={20} className="md:w-6 md:h-6" /></a>
                 <a href="#" className="text-zinc-400 hover:text-white transition-colors"><Github size={20} className="md:w-6 md:h-6" /></a>
               </div>
             </div>
