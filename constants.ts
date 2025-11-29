@@ -7,7 +7,7 @@ export const RESUME_DATA: ResumeData = {
     email: "kneftcp123@gmail.com",
     phone: "+60163521234",
     location: "43200 Cheras, Malaysia",
-    linkedin: "Tan Chun Pan",
+    linkedin: "https://www.linkedin.com/in/tan-chun-pan-knef-423050215/",
     summary: "I am an R&D Software Engineer at Keysight with a strong interest in machine learning, computer vision, and applied AI. A tech enthusiast at heart, I enjoy exploring how intelligent systems can improve real-world workflows and everyday technical processes. I’m goal-driven, collaborative, and continuously expanding my skills across emerging technologies."
   },
   skills: [
